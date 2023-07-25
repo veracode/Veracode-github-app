@@ -12,7 +12,7 @@ async function handleEvents(app, context) {
   // 1. handle branch deletion - will not trigger the process
   // 2. handle repository archiving - will not trigger the process
   //    although we should not expect to see push event from an archived repository
-  if(deleted || archived) return;
+  if (deleted || archived) return;
 
   // 3. handle excluded repositories
   const excludedRepositories = [appConfig().defaultOrganisationRepository];
