@@ -21,7 +21,7 @@ async function handleCompletedRun(app, context) {
   app.log.info(run);
 
   if (run.check_run_type.substring(0, 26) === 'veracode-local-compilation') 
-    handleCompletedCompilation(run, context);
+    handleCompletedCompilation(app, run, context);
   else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-iac-secrets-scan')
     updateChecksForCompletedScan(run, context);
   else if (run.check_run_type === 'veracode-sast-policy-scan')

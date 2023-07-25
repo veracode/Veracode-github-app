@@ -6,7 +6,7 @@ let config = {}
 if (process.env.NODE_ENV === 'development') {
   config.region = process.env.DB_REGION
   config.endpoint = process.env.DB_ENDPOINT
-  config.accessKey = process.env.FOOBAR
+  config.accessKey = process.env.DB_ACCESSKEY
   config.secretAccessKey = process.env.DB_SECRETACCESSKEY
 } else {
   config.region = process.env.DB_REGION

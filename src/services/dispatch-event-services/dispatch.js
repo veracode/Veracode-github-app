@@ -7,7 +7,8 @@ const createDispatchEvent = async function (event, dispatchEventData) {
     client_payload: {
       ...dispatchEventData.payload,
       event: context.payload,
-      event_type: event.event_type
+      event_type: event.event_type,
+      modules_to_scan: event.modules_to_scan ?? '',
     }
   });
 }

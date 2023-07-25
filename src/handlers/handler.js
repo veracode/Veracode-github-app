@@ -1,6 +1,7 @@
 const { shouldRunForRepository } = require('../services/config-services/should-run');
 const { getDispatchEvents } = require('../services/dispatch-event-services/get-dispatch-events');
 const { createDispatchEvent } = require('../services/dispatch-event-services/dispatch');
+const { getVeracodeScanConfig } = require('../services/config-services/get-veracode-config');
 const appConfig = require('../app-config');
 
 async function handleEvents(app, context) {
@@ -27,7 +28,8 @@ async function handleEvents(app, context) {
 
   const sha = context.name === 'push' ? context.payload.after : context.payload.pull_request.head.sha;
 
-  const dispatchEvents = await getDispatchEvents(app, context, branch);
+  const veracodeScanConfigs = await getVeracodeScanConfig(app, context);
+  const dispatchEvents = await getDispatchEvents(app, context, branch, veracodeScanConfigs);
 
   const api = context.octokit;
 
