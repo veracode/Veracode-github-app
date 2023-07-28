@@ -1,4 +1,13 @@
 {
+  "default": [
+    {
+      "build_tool": "NA",
+      "repository_dispatch_type": {
+        "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
+        "veracode_sast_policy_scan": "source-code-policy-scan"
+      }
+    }
+  ],
   "Java": [
     {
       "build_tool": "pom.xml",
@@ -16,6 +25,15 @@
     }
   ],
   "JavaScript": [
+    {
+      "build_tool": "NA",
+      "repository_dispatch_type": {
+        "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
+        "veracode_sast_policy_scan": "source-code-policy-scan"
+      }
+    }
+  ],
+  "TypeScript": [
     {
       "build_tool": "NA",
       "repository_dispatch_type": {

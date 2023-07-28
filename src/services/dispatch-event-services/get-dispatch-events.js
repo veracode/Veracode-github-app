@@ -13,7 +13,7 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs) {
 
   let dispatchEvents = [];
   const veracodeConfigKeys = Object.keys(veracodeScanConfigs);
-  
+
   for (const scanType of veracodeConfigKeys) {
     if (!await shouldRunScanType(eventName, branch, defaultBranch, veracodeScanConfigs[scanType], action, targetBranch))
       continue;

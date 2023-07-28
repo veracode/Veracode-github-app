@@ -34,7 +34,7 @@ async function getAutoBuildEvent(app, context, scanType) {
     );
     foundByPrimary = true;
   } catch (error) {
-    app.log.info(error.message);
+    app.log.info(`Primary ${error.message}`);
   }
 
   // THE BELOW SECTION RETRIEVES ALL LANGUAGES DETECTED IN THE REPOSITORY
@@ -48,6 +48,7 @@ async function getAutoBuildEvent(app, context, scanType) {
         sortedLanguages.push(key);
       }
       autoBuildEvent = await getAutoBuildEventByLanguage(
+        app,
         sortedLanguages, 
         octokit,
         owner,
@@ -56,16 +57,25 @@ async function getAutoBuildEvent(app, context, scanType) {
       );
     } catch (error) {
       app.log.info(error.message);
-      return null;
+      return await getAutoBuildEventByLanguage(
+        app,
+        ['default'], 
+        octokit,
+        owner,
+        originalRepo,
+        scanType
+      );
     }
   }
-
+  app.log.info(`Auto Build Event: ${autoBuildEvent}`);
   return autoBuildEvent;
 }
 
 async function getAutoBuildEventByLanguage(app, languages, octokit, owner, originalRepo, scanType) {
   const buildInstructionPath = 'src/utils/build-instructions.json';
   const buildInstructions = JSON.parse(await fs.readFile(buildInstructionPath));
+
+  console.log(`Languages: ${languages}`);
 
   for (idx in languages) {
     if (languages[idx] in buildInstructions)

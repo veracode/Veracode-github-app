@@ -30,3 +30,14 @@
 const scanType = 'veracode_container_security_scan';
 const scanEventType = scanType.replaceAll(/-/g, '_');
 console.log(scanEventType);
+
+
+let dispatchEvents = [];
+dispatchEvents.push({
+  event_type: 'test',
+  repository: 'default_organization_repository',
+  event_trigger: 'test',
+  modules_to_scan: undefined,
+});
+
+console.log(dispatchEvents);
