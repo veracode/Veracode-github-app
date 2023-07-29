@@ -27,15 +27,17 @@ module.exports = async (app, { getRouter }) => {
   // });
 
   app.on('issues.opened', async context => {
-    app.log.info(new Date().toString(),context);
+    app.log.info(new Date().toISOString(),context);
   });
 
   const router = getRouter('');
   router.get('/register', (req, res) => {
     handleRegister(req, res, { app });
+    app.log.info(new Date().toISOString(),req);
   });
 
   router.get('/health-check', (req, res) => {
     return res.status(200).send('Hello World');
+    app.log.info(new Date().toISOString(),res);
   });
 };
