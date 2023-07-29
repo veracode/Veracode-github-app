@@ -15,7 +15,7 @@ async function enforceProtection (octokit, repository, context_name, enforce, en
       branch: repo.data.default_branch
     })
   } catch (e) {
-    console.error(e)
+    console.error(new Date().toString()+' - '+e)
   }
 
   // console.log(protection);

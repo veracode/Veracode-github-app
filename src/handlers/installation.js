@@ -25,7 +25,7 @@ async function handleInstallationRepositories(app, context) {
   });
 
   if (action === "deleted") {    
-    log.info(`😭 ${account.type} ${account.login} uninstalled`);
+    log.info(new Date().toString()+' - '+`😭 ${account.type} ${account.login} uninstalled`);
     return;
   }
 
@@ -50,7 +50,7 @@ async function handleInstallationRepositories(app, context) {
 
   // }
   repos = repos.filter(n => n);
-  log.info(repos);
+  log.info(new Date().toString()+' - '+repos);
   repos.forEach(async ({name}) => {
     if(name == undefined){
         return;
@@ -58,7 +58,7 @@ async function handleInstallationRepositories(app, context) {
     const internalName = name;
     context.repo = () => ({ owner: accountLogin, repo: internalName, path: `veracode.yml` });
     context.repo = (val) => ({ owner: accountLogin, repo: internalName, ...val });
-    console.log(`running handler for ${name}`)
+    console.log(new Date().toString()+' - '+`running handler for ${name}`)
     return handleInstallation(app, context);
   });
 }
@@ -94,7 +94,7 @@ async function handleInstallation(app, context) {
 
   if (action === "added") {
     log.info(
-      `➕ ${account.type} ${account.login} added ${pluralize(
+      new Date().toString()+' - '+`➕ ${account.type} ${account.login} added ${pluralize(
         "repository",
         added.length,
         true

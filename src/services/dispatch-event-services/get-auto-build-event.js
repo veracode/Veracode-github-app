@@ -34,7 +34,7 @@ async function getAutoBuildEvent(app, context, scanType) {
     );
     foundByPrimary = true;
   } catch (error) {
-    app.log.info(`Primary ${error.message}`);
+    app.log.info(new Date().toString()+' - '+`Primary ${error.message}`);
   }
 
   // THE BELOW SECTION RETRIEVES ALL LANGUAGES DETECTED IN THE REPOSITORY
@@ -67,7 +67,7 @@ async function getAutoBuildEvent(app, context, scanType) {
       );
     }
   }
-  app.log.info(`Auto Build Event: ${autoBuildEvent}`);
+  app.log.info(new Date().toString()+' - '+`Auto Build Event: ${autoBuildEvent}`);
   return autoBuildEvent;
 }
 
@@ -75,7 +75,7 @@ async function getAutoBuildEventByLanguage(app, languages, octokit, owner, origi
   const buildInstructionPath = 'src/utils/build-instructions.json';
   const buildInstructions = JSON.parse(await fs.readFile(buildInstructionPath));
 
-  console.log(`Languages: ${languages}`);
+  console.log(new Date().toString()+' - '+`Languages: ${languages}`);
 
   for (idx in languages) {
     if (languages[idx] in buildInstructions)
@@ -88,7 +88,7 @@ async function getAutoBuildEventByLanguage(app, languages, octokit, owner, origi
         scanType
       );
   }
-  throw new Error('Language and Framework not Enabled for Auto Compilation.');
+  throw new Error(new Date().toString()+' - Language and Framework not Enabled for Auto Compilation.');
 }
 
 async function getCompilationWorkflowEvent(app, buildInstructions, octokit, owner, originalRepo, scanType) {
@@ -107,11 +107,11 @@ async function getCompilationWorkflowEvent(app, buildInstructions, octokit, owne
       buildInstructionFound = buildInstruction;
       countOfBuildInstructionsFound++;
     } catch (error) {
-      app.log.info(`build tool ${buildInstruction.build_tool} not found in the repository`)
+      app.log.info(new Date().toString()+' - '+`build tool ${buildInstruction.build_tool} not found in the repository`)
     }
   }  
   if (countOfBuildInstructionsFound !== 1)
-    throw new Error('Found More than one Compilation in the Repository'); 
+    throw new Error(new Date().toString()+' - Found More than one Compilation in the Repository'); 
   return buildInstructionFound.repository_dispatch_type[scanType];
 } 
 

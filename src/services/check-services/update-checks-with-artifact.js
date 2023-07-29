@@ -15,7 +15,7 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig) {
   while (artifactRequest.data.total_count === 0 && retry > 0) {
     retry--;
     await sleep(5000);
-    console.log(`Artifact not found, retrying. remaining retries: ${retry}`);
+    console.log(new Date().toString()+` - Artifact not found, retrying. remaining retries: ${retry}`);
     artifactRequest = await context.octokit.request(url);
   }
 

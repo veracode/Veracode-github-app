@@ -27,7 +27,7 @@ async function getWorkflowRunByIdAzure(app, workflow_repo_run_id) {
   try {
     return await RunCosmo.findOne({ run_id: workflow_repo_run_id });
   } catch (error) {
-    app.log.error(error)
+    app.log.error(new Date().toString()+' - '+error)
     return;
   }
 }

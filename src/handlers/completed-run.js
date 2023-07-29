@@ -18,7 +18,7 @@ async function handleCompletedRun(app, context) {
   const run = await getWorkflowRunById(app, workflow_repo_run_id);
 
   if (!run) return
-  app.log.info(run);
+  app.log.info(new Date().toString()+' - '+run);
 
   if (run.check_run_type.substring(0, 26) === 'veracode-local-compilation') 
     handleCompletedCompilation(app, run, context);

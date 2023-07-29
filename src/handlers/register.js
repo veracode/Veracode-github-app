@@ -38,7 +38,7 @@ async function handleRegister (req, res, { app }) {
     await saveWorkflowRun(run_id, sha, branch, repository_owner, repository_name, event_type, checks_run);
     return res.sendStatus(200);
   } catch (error) {
-    app.log.error(error);
+    app.log.error(new Date().toString()+' - '+error);
     return response.status(500).json({err: 'DatabaseError'})
   }
 }

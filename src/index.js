@@ -27,7 +27,7 @@ module.exports = async (app, { getRouter }) => {
   // });
 
   app.on('issues.opened', async context => {
-    app.log.info(context);
+    app.log.info(new Date().toString(),context);
   });
 
   const router = getRouter('');

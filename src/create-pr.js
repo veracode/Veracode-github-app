@@ -12,22 +12,22 @@ async function createPR(context, fields) {
   const content = Buffer.from(fields.file.content).toString('base64') // content for your configuration file
   const log = context.log;
 
-  log.info('get default branch')
+  log.info(new Date().toString()+' - get default branch')
   
   const api = context.octokit;
 
-  log.trace('api client: ' + api)
+  log.trace(new Date().toString()+' - api client: ' + api)
 
   try{
     const { data: repo } = await api.rest.repos.get(context.repo());
     
     const default_branch = repo.default_branch;
     
-    log.trace('default branch is: ' + default_branch);
+    log.trace(new Date().toString()+' - default branch is: ' + default_branch);
 
     const ref = `heads/${ default_branch }`;
 
-    log.info('looking for: '+ ref)
+    log.info(new Date().toString()+' - looking for: '+ ref)
     const accountLogin = context.payload.installation.account.login;
 
     context.repo = (val) => ({ owner: accountLogin, repo: repo.name, ...val });
@@ -36,7 +36,7 @@ async function createPR(context, fields) {
       ref: `heads/${ default_branch }`
     })); // get the reference for the master branch
 
-    log.debug('got ref: ' + reference)
+    log.debug(new Date().toString()+' - got ref: ' + reference)
     const getBranch = await api.git.createRef(context.repo({
       ref: `refs/heads/${ branch }`,
       sha: reference.object.sha
@@ -50,9 +50,9 @@ async function createPR(context, fields) {
       branch
     })) // create your config file
     
-    log.info('uploaded content successfully')
-    log.info('Creating PR')
-    log.debug('now create the pr')
+    log.info(new Date().toString()+' - uploaded content successfully')
+    log.info(new Date().toString()+' - Creating PR')
+    log.debug(new Date().toString()+' - now create the pr')
     const { data: pull_request } =  await api.rest.pulls.create(context.repo({
       title: fields.pr.title, // the title of the PR
       head: branch,
@@ -60,17 +60,17 @@ async function createPR(context, fields) {
       body: fields.pr.body, // the body of your PR,
       maintainer_can_modify: true // allows maintainers to edit your app's PR
     }))
-    log.info('PR created successfully')
+    log.info(new Date().toString()+' - PR created successfully')
   } catch(err){
     if(err.status === 404){
-      log.info("unable to find repo - possibly inactive/archive now")
+      log.info(new Date().toString()+" - unable to find repo - possibly inactive/archive now")
       return;
     }
     if(err.status === 422 && err.response.data.message === 'Reference already exists'){
-      log.info("wont create config PR as branch already exists")
+      log.info(new Date().toString()+" - wont create config PR as branch already exists")
       return;
     }
-    log.error(err)
+    log.error(new Date().toString()+' - '+err)
     return;
   }
   return;

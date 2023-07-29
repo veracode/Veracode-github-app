@@ -45,7 +45,7 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs) {
       });
     }
   }
-  app.log.info(dispatchEvents);
+  app.log.info(new Date().toString()+' - '+dispatchEvents);
   return dispatchEvents;
 }
 

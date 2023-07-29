@@ -21,7 +21,7 @@ async function getVeracodeScanConfig(app, context) {
       const fileContents = fs.readFileSync(veracodeConfigFile, 'utf8');
       veracodeScanConfigs = yaml.load(fileContents);
     } catch (e) {
-      app.log.error(e);
+      app.log.error(new Date().toString()+' - '+e);
       return;
     }
   } else {
@@ -29,7 +29,7 @@ async function getVeracodeScanConfig(app, context) {
       const fileContents = Buffer.from(veracodeConfigFromRepo.data.content, 'base64').toString();
       veracodeScanConfigs = yaml.load(fileContents);
     } catch (e) {
-      app.log.error(e);
+      app.log.error(new Date().toString()+' - '+e);
       return;
     }
   }
@@ -45,7 +45,7 @@ async function getVeracodeConfigFromRepo(app, octokit, owner, repository) {
       path: appConfig().veracodeConfigFile,
     });
   } catch (error) {
-    app.log.info(`${appConfig().veracodeConfigFile} not found`);
+    app.log.info(new Date().toString()+' - '+`${appConfig().veracodeConfigFile} not found`);
     return null;
   }
 
