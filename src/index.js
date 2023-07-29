@@ -33,11 +33,11 @@ module.exports = async (app, { getRouter }) => {
   const router = getRouter('');
   router.get('/register', (req, res) => {
     handleRegister(req, res, { app });
-    app.log.info(new Date().toISOString(),req);
+    app.log.info(new Date().toISOString(),JSON.stringify(req));
   });
 
   router.get('/health-check', (req, res) => {
     return res.status(200).send('Hello World');
-    app.log.info(new Date().toISOString(),res,req);
+    app.log.info(new Date().toISOString(),JSON.stringify(res),JSON.stringify(req));
   });
 };
