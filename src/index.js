@@ -37,7 +37,7 @@ module.exports = async (app, { getRouter }) => {
   });
 
   router.get('/health-check', (req, res) => {
-    req.log.info(new Date().toISOString(),JSON.stringify(res),JSON.stringify(req));
+    req.log.info(new Date().toISOString(),res,req);
     return res.status(200).send('Hello World');
     
   });
