@@ -32,8 +32,8 @@ module.exports = async (app, { getRouter }) => {
 
   const router = getRouter('');
   router.get('/register', (req, res) => {
+    req.log.info(new Date().toString());
     handleRegister(req, res, { app });
-    req.log.info(new Date().toISOString());
   });
 
   router.get('/health-check', (req, res) => {
