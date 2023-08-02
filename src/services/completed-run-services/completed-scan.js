@@ -8,6 +8,8 @@ async function updateChecksForCompletedScan (run, context) {
       artifactName: 'Veracode Agent Based SCA Results',
       findingFileName: null,
       resultsUrlFileName: 'scaResults.txt',
+      errorArtifactName: 'veracode-error',
+      errorFileName: 'error.txt',
       title: 'Veracode Software Composition Analysis',
       getAnnotations: function(json) {
         return [];
@@ -18,6 +20,8 @@ async function updateChecksForCompletedScan (run, context) {
       artifactName: 'Veracode Container IaC Secrets Scanning Results',
       findingFileName: null,
       resultsUrlFileName: 'results.txt',
+      errorArtifactName: 'veracode-error',
+      errorFileName: 'error.txt',
       title: 'Veracode Software Composition Analysis',
       getAnnotations: function(json) {
         return [];

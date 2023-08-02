@@ -33,7 +33,8 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig) {
   let resultsUrl = '';
 
   for (const artifact of artifacts.artifacts) {
-    if (artifact.name !== scanConfig.artifactName) {
+    if (artifact.name !== scanConfig.artifactName 
+        && artifact.name !== scanConfig.errorArtifactName) {
       continue;
     }
     const timestamp = new Date().toISOString();
@@ -50,17 +51,27 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig) {
     const zip = new AdmZip(artifactFilename);
     zip.extractAllTo(`${destination}`, /*overwrite*/true);
 
-    if (scanConfig.resultsUrlFileName !== null) {
-      resultsUrl = fs.readFileSync(
-        `${destination}/${scanConfig.resultsUrlFileName}`, 
-        'utf8'
-      );
+    if (artifact.name === scanConfig.errorArtifactName) {
+      if (scanConfig.errorFileName !== null) {
+        resultsUrl = fs.readFileSync(
+          `${destination}/${scanConfig.errorFileName}`, 
+          'utf8'
+        );
+      }
+    } else {
+      if (scanConfig.resultsUrlFileName !== null) {
+        resultsUrl = fs.readFileSync(
+          `${destination}/${scanConfig.resultsUrlFileName}`, 
+          'utf8'
+        );
+      }
+      if (scanConfig.findingFileName !== null) {
+        const data = fs.readFileSync(`${destination}/${scanConfig.findingFileName}`)
+        const json = JSON.parse(data);
+        annotations = scanConfig.getAnnotations(json);
+      }
     }
-    if (scanConfig.findingFileName !== null) {
-      const data = fs.readFileSync(`${destination}/${scanConfig.findingFileName}`)
-      const json = JSON.parse(data);
-      annotations = scanConfig.getAnnotations(json);
-    }
+    
     fs.rm(destination, { recursive: true });
     fs.rm(artifactFilename);
   }

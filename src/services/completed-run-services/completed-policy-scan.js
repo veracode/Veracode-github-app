@@ -6,6 +6,8 @@ async function updateChecksForCompletedPolicyScan (run, context) {
     artifactName: 'policy-flaws',
     findingFileName: 'policy_flaws.json',
     resultsUrlFileName: 'results_url.txt',
+    errorArtifactName: 'veracode-error',
+    errorFileName: 'error.txt',
     title: 'Veracode Static Analysis',
     getAnnotations: function(json) {
       let annotations = []

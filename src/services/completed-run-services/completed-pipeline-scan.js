@@ -6,6 +6,8 @@ async function updateChecksForCompletedPipelineScan (run, context) {
     artifactName: 'Veracode Pipeline-Scan Results',
     findingFileName: 'filtered_results.json',
     resultsUrlFileName: null,
+    errorArtifactName: 'veracode-error',
+    errorFileName: 'error.txt',
     title: 'Veracode Static Analysis',
     getAnnotations: function(json) {
       let annotations = []
