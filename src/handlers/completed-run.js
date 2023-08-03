@@ -37,7 +37,7 @@ async function handleCompletedRun(app, context) {
       if (failedJob.name.includes('build')) {
         const output = {
           title: 'Build Failed',
-          summary: `The Veracode SAST scan failed, please review the individual action and  Scan on the Veracode platform. Please also review the Veracode package guidance https://docs.veracode.com/r/compilation_packaging and talk to your Veracode team to get this security scanned.`
+          summary: `The packing for Veracode SAST scan failed, please review the individual action and  Scan on the Veracode platform. Please also review the Veracode package guidance https://docs.veracode.com/r/compilation_packaging and talk to your Veracode team to get this security scanned.`
         }
         await updateChecks(run, context, output);
         return;
