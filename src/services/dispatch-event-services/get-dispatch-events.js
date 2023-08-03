@@ -30,13 +30,22 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs) {
           event_trigger: veracodeScanConfigs[scanType].local_compilation_workflow,
         });
       } else {
+        const buildInstruction = await getAutoBuildEvent(app, context, scanType);
         dispatchEvents.push({
           event_type: scanEventType,
           repository: default_organization_repository,
-          event_trigger: await getAutoBuildEvent(app, context, scanType),
+          event_trigger: buildInstruction.repository_dispatch_type[scanType],
           modules_to_scan: veracodeScanConfigs[scanType].modules_to_scan,
         });
       }
+    } else if(scanType.includes('sca')) {
+      const buildInstruction = await getAutoBuildEvent(app, context, scanType);
+      if (buildInstruction.veracode_sca_scan === 'true')
+        dispatchEvents.push({
+          event_type: scanEventType,
+          repository: default_organization_repository,
+          event_trigger: scanEventType,
+        });
     } else {
       dispatchEvents.push({
         event_type: scanEventType,

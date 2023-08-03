@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 
-async function getAutoBuildEvent(app, context, scanType) {
+async function getAutoBuildEvent(app, context) {
   const primaryLanguage = context.payload.repository.language;
   const owner = context.payload.repository.owner.login;
   const originalRepo = context.payload.repository.name;
@@ -29,8 +29,7 @@ async function getAutoBuildEvent(app, context, scanType) {
       [primaryLanguage], 
       octokit,
       owner,
-      originalRepo,
-      scanType
+      originalRepo
     );
     foundByPrimary = true;
   } catch (error) {
@@ -52,8 +51,7 @@ async function getAutoBuildEvent(app, context, scanType) {
         sortedLanguages, 
         octokit,
         owner,
-        originalRepo,
-        scanType
+        originalRepo
       );
     } catch (error) {
       app.log.info(error.message);
@@ -62,8 +60,7 @@ async function getAutoBuildEvent(app, context, scanType) {
         ['default'], 
         octokit,
         owner,
-        originalRepo,
-        scanType
+        originalRepo
       );
     }
   }
@@ -71,11 +68,9 @@ async function getAutoBuildEvent(app, context, scanType) {
   return autoBuildEvent;
 }
 
-async function getAutoBuildEventByLanguage(app, languages, octokit, owner, originalRepo, scanType) {
+async function getAutoBuildEventByLanguage(app, languages, octokit, owner, originalRepo) {
   const buildInstructionPath = 'src/utils/build-instructions.json';
   const buildInstructions = JSON.parse(await fs.readFile(buildInstructionPath));
-
-  console.log(`Languages: ${languages}`);
 
   for (idx in languages) {
     if (languages[idx] in buildInstructions)
@@ -84,14 +79,13 @@ async function getAutoBuildEventByLanguage(app, languages, octokit, owner, origi
         buildInstructions[languages[idx]], 
         octokit,
         owner,
-        originalRepo,
-        scanType
+        originalRepo
       );
   }
   throw new Error('Language and Framework not Enabled for Auto Compilation.');
 }
 
-async function getCompilationWorkflowEvent(app, buildInstructions, octokit, owner, originalRepo, scanType) {
+async function getCompilationWorkflowEvent(app, buildInstructions, octokit, owner, originalRepo) {
   let countOfBuildInstructionsFound = 0;
   let buildInstructionFound;
 
@@ -112,7 +106,7 @@ async function getCompilationWorkflowEvent(app, buildInstructions, octokit, owne
   }  
   if (countOfBuildInstructionsFound !== 1)
     throw new Error('Found More than one Compilation in the Repository'); 
-  return buildInstructionFound.repository_dispatch_type[scanType];
+  return buildInstructionFound;
 } 
 
 module.exports = {
