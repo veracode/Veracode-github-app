@@ -38,7 +38,7 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs) {
           modules_to_scan: veracodeScanConfigs[scanType].modules_to_scan,
         });
       }
-    } else if(scanType.includes('sca')) {
+    } else if(scanType.includes('sca_scan')) {
       const buildInstruction = await getAutoBuildEvent(app, context, scanType);
       if (buildInstruction.veracode_sca_scan === 'true')
         dispatchEvents.push({
