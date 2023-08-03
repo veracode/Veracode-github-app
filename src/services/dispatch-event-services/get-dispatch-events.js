@@ -18,6 +18,7 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs) {
     if (!await shouldRunScanType(eventName, branch, defaultBranch, veracodeScanConfigs[scanType], action, targetBranch))
       continue;
     const scanEventType = scanType.replaceAll(/_/g, '-');
+    console.log(scanType);
     
     // for sast scan, if compile_locally is true, dispatch to local compilation workflow
     // otherwise, dispatch to default organization repository with auto build
@@ -38,7 +39,7 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs) {
           modules_to_scan: veracodeScanConfigs[scanType].modules_to_scan,
         });
       }
-    } else if(scanType.includes('sca-scan')) {
+    } else if(scanType.includes('sca_scan')) {
       const buildInstruction = await getAutoBuildEvent(app, context, scanType);
       if (buildInstruction.veracode_sca_scan === 'true')
         dispatchEvents.push({
