@@ -5,7 +5,8 @@
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "veracode-not-supported",
         "veracode_sast_policy_scan": "veracode-not-supported"
-      }
+      },
+      "veracode_sca_scan": "false"
     }
   ],
   "Java": [
@@ -14,14 +15,16 @@
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "java-maven-pipeline-scan",
         "veracode_sast_policy_scan": "java-maven-policy-scan"
-      }
+      },
+      "veracode_sca_scan": "true"
     },
     {
       "build_tool": "build.gradle",
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "java-gradle-pipeline-scan",
         "veracode_sast_policy_scan": "java-gradle-policy-scan"
-      }
+      },
+      "veracode_sca_scan": "true"
     }
   ],
   "JavaScript": [
@@ -30,7 +33,8 @@
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
         "veracode_sast_policy_scan": "source-code-policy-scan"
-      }
+      },
+      "veracode_sca_scan": "true"
     }
   ],
   "TypeScript": [
@@ -39,7 +43,8 @@
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
         "veracode_sast_policy_scan": "source-code-policy-scan"
-      }
+      },
+      "veracode_sca_scan": "true"
     }
   ],
   "Python": [
@@ -48,7 +53,8 @@
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
         "veracode_sast_policy_scan": "source-code-policy-scan"
-      }
+      },
+      "veracode_sca_scan": "true"
     }
   ],
   "PLSQL": [
@@ -57,7 +63,8 @@
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
         "veracode_sast_policy_scan": "source-code-policy-scan"
-      }
+      },
+      "veracode_sca_scan": "false"
     }
   ],
   "TSQL": [
@@ -66,7 +73,8 @@
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
         "veracode_sast_policy_scan": "source-code-policy-scan"
-      }
+      },
+      "veracode_sca_scan": "false"
     }
   ],
   "C#": [
@@ -75,7 +83,8 @@
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "dot-net-pipeline-scan",
         "veracode_sast_policy_scan": "dot-net-policy-scan"
-      }
+      },
+      "veracode_sca_scan": "true"
     }
   ],
   "PHP": [
@@ -84,7 +93,8 @@
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
         "veracode_sast_policy_scan": "source-code-policy-scan"
-      }
+      },
+      "veracode_sca_scan": "true"
     }
   ],
   "Perl": [
@@ -93,7 +103,8 @@
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
         "veracode_sast_policy_scan": "source-code-policy-scan"
-      }
+      },
+      "veracode_sca_scan": "false"
     }
   ]
 }
