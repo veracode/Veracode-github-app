@@ -1,0 +1,10 @@
+{
+    "SCAIAC": {
+        "errorMessage": [
+            "No supported build system found",
+            "Failure executing dependency:tree",
+            "Veracode SCA agent was unable to resolve the project's dependencies"
+        ],
+        "successMessage": "Finish command"
+    }
+}
