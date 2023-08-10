@@ -48,12 +48,6 @@ async function handleCompletedRun(app, context) {
     else
       updateChecksForCompletedPipelineScan(run, context, workflowRunJobs);
   }
-
-//   const sha = run.sha;
-//   const pullRequests = await context.octokit.search.issuesAndPullRequests({
-//     q: `repo:${owner}/${run.repository.name} is:pr ${sha}`,
-//   });
-//   console.log(pullRequests.data);
 }
 
 module.exports = {

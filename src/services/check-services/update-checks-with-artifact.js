@@ -77,10 +77,16 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig) {
   }
 
   if (annotations.length === 0) {
+    const resultsTooLarge = resultsUrl.length > 60000;
+    let truncatedResults = resultsTooLarge ? resultsUrl.substring(0, 60000) : resultsUrl;
+    if (resultsTooLarge) {
+      truncatedResults = 'The scan finished but the output is too big it dispaly here,' + 
+       ` please check the artifact individually.\n\n${truncatedResults}`
+    }
     updateChecks(run, context, {
       annotations: [],
       title: scanConfig.title,
-      summary: `<pre>${resultsUrl}</pre>`
+      summary: `<pre>${truncatedResults}</pre>`
     });
     return;
   }
