@@ -10,8 +10,6 @@ const { handleCompletedCompilation } =
 const { 
   updateChecksForCompletedPolicyScan, 
 } = require('../services/completed-run-services/completed-policy-scan');
-const fs = require('fs').promises;
-const { getVeracodeScanConfig } = require('../services/config-services/get-veracode-config');
 
 async function handleCompletedRun(app, context) {
   if (!context.payload.workflow_run.id) return;
@@ -19,6 +17,7 @@ async function handleCompletedRun(app, context) {
   const workflow_reopo_owner = context.payload.repository.owner.login;
   const workflow_repo_name = context.payload.repository.name;
   const workflow_repo_run_id = context.payload.workflow_run.id;
+  const runConclusion = context.payload.workflow_run?.conclusion;
 
   const run = await getWorkflowRunById(app, workflow_repo_run_id);
   if (!run) return
@@ -29,40 +28,9 @@ async function handleCompletedRun(app, context) {
 
   if (run.check_run_type.substring(0, 26) === 'veracode-local-compilation') 
     handleCompletedCompilation(app, run, context);
-  else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-iac-secrets-scan') {
-    const logMessageEnumerationFilePath = 'src/utils/log-message-enumeration.json';
-    const logMessageEnumeration = JSON.parse(await fs.readFile(logMessageEnumerationFilePath));
-    let failedJob = workflowRunJobs.data.jobs.find(job => job.conclusion === 'failure');
-    const logUrl = `GET /repos/${workflow_reopo_owner}/${workflow_repo_name}/actions/jobs/${failedJob.id}/logs`
-    const log = await context.octokit.request(logUrl);
-
-    let scanRunIntoErrorMessage = '';
-    const lines = log.data.split('\n');
-
-    lines.forEach(line => {
-      logMessageEnumeration.SCAIAC.errorMessage.forEach(errorMsg => {
-        if (line.includes(errorMsg)) {
-          scanRunIntoErrorMessage += line + '\n';
-        }
-      });
-    });
-
-    if (scanRunIntoErrorMessage === '') {
-      updateChecksForCompletedScan(run, context);
-      return;
-    }
-
-    const veracodeScanConfigs = await getVeracodeScanConfig(app, context);
-    scanRunIntoErrorMessage += '\n' + veracodeScanConfigs.veracode_sca_scan.error_message + '\n';
-    const output = {
-      title: run.check_run_type === 'veracode-sca-scan' ? 
-        'Failed to Complete Veracode SCA Scan' : 'Failed to Complete Veracode IAC Secrets Scan',
-      summary: scanRunIntoErrorMessage
-    }
-    await updateChecks(run, context, output);
-  }
+  else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-iac-secrets-scan')
+    await updateChecksForCompletedScan(app, run, context, workflowRunJobs);
   else { /* This section handles SAST */
-    const runConclusion = context.payload.workflow_run?.conclusion;
     if (runConclusion === 'failure') {
       let failedJob = workflowRunJobs.data.jobs.find(job => job.conclusion === 'failure');
 
