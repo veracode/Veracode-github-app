@@ -10,6 +10,8 @@ async function updateChecksForCompletedScan (app, run, context, workflowRunJobs)
   const workflow_reopo_owner = context.payload.repository.owner.login;
   const workflow_repo_name = context.payload.repository.name;
 
+  const veracodeScanConfigs = await getVeracodeScanConfig(app, context);
+
   if (runConclusion === 'failure') {
     const logMessageEnumerationFilePath = 'src/utils/log-message-enumeration.json';
     const logMessageEnumeration = JSON.parse(await fs.readFile(logMessageEnumerationFilePath));
@@ -30,9 +32,10 @@ async function updateChecksForCompletedScan (app, run, context, workflowRunJobs)
 
     /* If there are defined error message in the retrieved log,
      * update the check run with the error message and return.
+     * The below is only processing SCA Failed Scenarios.
+     * TODO: Add IAC Secrets Failed Scenarios.
     */
     if (scanRunIntoErrorMessage !== '') {
-      const veracodeScanConfigs = await getVeracodeScanConfig(app, context);
       scanRunIntoErrorMessage += `\n${veracodeScanConfigs.veracode_sca_scan.error_message}\n`;
       const output = {
         title: run.check_run_type === 'veracode-sca-scan' 
@@ -40,7 +43,8 @@ async function updateChecksForCompletedScan (app, run, context, workflowRunJobs)
           : 'Failed to Complete Veracode IAC Secrets Scan',
         summary: scanRunIntoErrorMessage
       }
-      await updateChecks(run, context, output);
+      const conclusion = veracodeScanConfigs.veracode_sca_scan.break_build_on_error ? 'failure' : 'success';
+      await updateChecks(run, context, output, conclusion);
       return;
     }
   }
@@ -71,7 +75,7 @@ async function updateChecksForCompletedScan (app, run, context, workflowRunJobs)
       }
     }
   }
-  await updateChecksForCompletedSastScan(run, context, scaScanConfig);
+  await updateChecksForCompletedSastScan(run, context, scaScanConfig, veracodeScanConfigs);
 }
 
 module.exports = {

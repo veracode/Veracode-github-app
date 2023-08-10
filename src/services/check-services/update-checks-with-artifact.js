@@ -3,7 +3,7 @@ const AdmZip = require("adm-zip");
 const { artifact_folder } = require('../../utils/constants');
 const { updateChecks } = require('./checks');
 
-async function updateChecksForCompletedSastScan(run, context, scanConfig) {
+async function updateChecksForCompletedSastScan(run, context, scanConfig, veracodeScanConfigs = undefined) {
   const workflow_reopo_owner = context.payload.repository.owner.login;
   const workflow_repo_name = context.payload.repository.name;
   const workflow_repo_run_id = context.payload.workflow_run.id;
@@ -81,13 +81,22 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig) {
     let truncatedResults = resultsTooLarge ? resultsUrl.substring(0, 60000) : resultsUrl;
     if (resultsTooLarge) {
       truncatedResults = 'The scan finished but the output is too big it dispaly here,' + 
-       ` please check the artifact individually.\n\n${truncatedResults}`
+       ` please check the artifact individually.\n\n${truncatedResults}`;
+    }
+    /* 
+     * The below is processing failing the checks or not for SCA scan.
+     * TODO: add IaC/Secrets scan.
+    */
+    let conclusion = context.payload.workflow_run?.conclusion;
+    if (conclusion === 'failure') {
+      if (run.check_run_type === 'veracode-sca-scan')
+        conclusion = veracodeScanConfigs.veracode_sca_scan.break_build_policy_findings ? 'failure' : 'success';
     }
     updateChecks(run, context, {
       annotations: [],
       title: scanConfig.title,
       summary: `<pre>${truncatedResults}</pre>`
-    });
+    }, conclusion);
     return;
   }
 
