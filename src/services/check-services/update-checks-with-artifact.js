@@ -7,6 +7,15 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig, veraco
   const workflow_reopo_owner = context.payload.repository.owner.login;
   const workflow_repo_name = context.payload.repository.name;
   const workflow_repo_run_id = context.payload.workflow_run.id;
+  const conclusion = context.payload.workflow_run?.conclusion;
+
+  const scanEventType = run.check_run_type.replaceAll(/-/g, '_');
+  let conclusionIfFail = 'failure';
+  let conclusionIfPolicyFail = 'failure';
+  if (veracodeScanConfigs && scanEventType in veracodeScanConfigs) {
+    conclusionIfFail = veracodeScanConfigs[scanEventType].break_build_on_error ? 'failure' : 'success';
+    conclusionIfPolicyFail = veracodeScanConfigs[scanEventType].break_build_policy_findings ? 'failure' : 'success';
+  }
 
   const url = `GET /repos/${workflow_reopo_owner}/${workflow_repo_name}/actions/runs/${workflow_repo_run_id}/artifacts`
   let artifactRequest = await context.octokit.request(url);
@@ -24,7 +33,7 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig, veraco
       annotations: [],
       title: scanConfig.title,
       summary: 'Failed to fetch results artifacts.'
-    });
+    }, conclusionIfFail);
     return;
   }
 
@@ -84,19 +93,25 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig, veraco
        ` please check the artifact individually.\n\n${truncatedResults}`;
     }
     /* 
-     * The below is processing failing the checks or not for SCA scan.
-     * TODO: add IaC/Secrets scan.
-    */
-    let conclusion = context.payload.workflow_run?.conclusion;
-    if (conclusion === 'failure') {
-      if (run.check_run_type === 'veracode-sca-scan')
-        conclusion = veracodeScanConfigs.veracode_sca_scan.break_build_policy_findings ? 'failure' : 'success';
+     * If the scan is a SAST policy scan, and the annotation is empty, it means the scan
+     * finished successfully and no policy violation was found. In this case, we will
+     * update the check run with a success conclusion.
+     */
+    if (run.check_run_type === 'veracode-sast-policy-scan') {
+      updateChecks(run, context, {
+        annotations: [],
+        title: scanConfig.title,
+        summary: `Here\'s the summary of the check result, the full report can be found [here](${resultsUrl}).`
+      }, 'success');
+      return;
+    } else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-iac-secrets-scan') {
+      /* If the scan is a SCA / IAC scan, and the workflow job returned successful, it means no policy violation */
+      updateChecks(run, context, {
+        annotations: [],
+        title: scanConfig.title,
+        summary: `<pre>${truncatedResults}</pre>`
+      }, conclusion === 'success' ? 'success' : conclusionIfFail);
     }
-    updateChecks(run, context, {
-      annotations: [],
-      title: scanConfig.title,
-      summary: `<pre>${truncatedResults}</pre>`
-    }, conclusion);
     return;
   }
 
@@ -114,7 +129,7 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig, veraco
         check_run_id: run.check_run_id,
         // name: `${check.name}`,
         status: context.payload.workflow_run?.status,
-        conclusion: context.payload.workflow_run?.conclusion,
+        conclusion: conclusion === 'success' ? 'success' : conclusionIfPolicyFail,
         output: {
           annotations: annotationBatch,
           title: 'Veracode Static Analysis',

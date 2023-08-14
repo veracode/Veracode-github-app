@@ -1,7 +1,7 @@
 const { updateChecksForCompletedSastScan } = 
   require('../check-services/update-checks-with-artifact');
 
-async function updateChecksForCompletedPolicyScan (app, run, context, workflowRunJobs) {
+async function updateChecksForCompletedPolicyScan (run, context, veracodeScanConfigs) {
   const policyScanConfig = {
     artifactName: 'policy-flaws',
     findingFileName: 'policy_flaws.json',
@@ -26,7 +26,7 @@ async function updateChecksForCompletedPolicyScan (app, run, context, workflowRu
       return annotations;
     }
   }
-  await updateChecksForCompletedSastScan(run, context, policyScanConfig);
+  await updateChecksForCompletedSastScan(run, context, policyScanConfig, veracodeScanConfigs);
 }
 
 module.exports = {

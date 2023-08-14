@@ -49,6 +49,10 @@ async function handleErrorInScan (app, run, context, workflowRunJobs, veracodeSc
 
   /* Step 3: Search the error message in the log file */
   lines.forEach(line => {
+    /* When this message is detected in the log, it means the Policy Scan completed, but 
+     * Fail Build Flag was set to True, so that the pipeline stopped.*/
+    if (line.includes('Policy Violation: Veracode Policy Scan Failed'))
+      return { "scanFailed": false }; 
     errorMessagesToSearch.forEach(errorMsg => {
       if (line.includes(errorMsg)) {
         scanRunIntoErrorMessage += line + '\n';
