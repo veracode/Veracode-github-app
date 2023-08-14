@@ -110,7 +110,7 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig, veraco
         annotations: [],
         title: scanConfig.title,
         summary: `<pre>${truncatedResults}</pre>`
-      }, conclusion === 'success' ? 'success' : conclusionIfFail);
+      }, conclusion === 'success' ? 'success' : conclusionIfPolicyFail);
     }
     return;
   }
