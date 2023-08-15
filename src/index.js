@@ -2,6 +2,7 @@ const { handleRegister } = require('./handlers/register');
 const { handleCompletedRun } = require('./handlers/completed-run');
 const { handleEvents } = require('./handlers/handler');
 const handleInstallationRepositories = require('./handlers/installation');
+const { handleRegisterWorkflow } = require('./handlers/register-workflow');
 
 module.exports = async (app, { getRouter }) => {
   app.on(
@@ -10,9 +11,14 @@ module.exports = async (app, { getRouter }) => {
   );
 
   app.on(
-    'workflow_run.completed', 
-    handleCompletedRun.bind(null, app)
+    'workflow_run.in_progress', 
+    handleRegisterWorkflow.bind(null, app)
   );
+
+  // app.on(
+  //   'workflow_run.completed', 
+  //   handleCompletedRun.bind(null, app)
+  // );
 
   // app.on([
   //   "installation",
