@@ -1,7 +1,5 @@
-const mapper = require('../db/dynamo-client');
-const Run = require('../models/run.model');
 const appConfig = require('../app-config');
-const { saveWorkflowRun } = require('../services/db-services/db-operations');
+const { saveWorkflowRun, getWorkflowRunById } = require('../services/db-services/db-operations');
 
 async function handleRegister (req, res, { app }) {
   const { 
@@ -15,6 +13,9 @@ async function handleRegister (req, res, { app }) {
     repository_name,
     event_type
   } = req.query
+
+  const run = await getWorkflowRunById(app, run_id);
+  if (run) return;
 
   const data = {
     owner: repository_owner,

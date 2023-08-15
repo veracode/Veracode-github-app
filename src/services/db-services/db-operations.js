@@ -17,7 +17,7 @@ async function getWorkflowRunByIdAWS(app, workflow_repo_run_id) {
   try {
     return await mapper.get(Object.assign(new RunDynamo(), { run_id: workflow_repo_run_id }));
   } catch (error) {
-    app.log.error(error)
+    app.log.error(error.message);
     return null;
   }
 }
