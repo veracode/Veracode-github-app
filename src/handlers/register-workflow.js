@@ -1,12 +1,15 @@
 const appConfig = require('../app-config');
-const { saveWorkflowRun } = require('../services/db-services/db-operations');
+const { saveWorkflowRun, getWorkflowRunById } = require('../services/db-services/db-operations');
 
 async function handleRegisterWorkflow(app, context) {
   const {
-    workflow_run: { id: runId, name: workflowRunName, check_suite_id},
+    workflow_run: { id: runId, name: workflowRunName},
     workflow: { name: workflowName},
-    repository: { owner: { login } }
+    repository: { owner: { login: owner } }
   } = context.payload;
+
+  const run = await getWorkflowRunById(app, runId);
+  if (run) return;
 
   // Regular expression pattern to match repository and SHA
   const regex = /Repo\s(.*?)\s-\sSha\s(.*?)\s-\sBranch\s(.*?)\s-\sEvent\s(.*?)$/;
@@ -30,17 +33,17 @@ async function handleRegisterWorkflow(app, context) {
   }
 
   const data = {
-    owner: login,
+    owner,
     repo: repositoryName,
     head_sha: sha,
     name: workflowName,
-    details_url: `${appConfig().githubHost}/${login}/${appConfig().defaultOrganisationRepository}/actions/runs/${runId}`,
+    details_url: `${appConfig().githubHost}/${owner}/${appConfig().defaultOrganisationRepository}/actions/runs/${runId}`,
     status: 'in_progress'
   }
 
   const checks_run = await context.octokit.checks.create(data);
   try {
-    await saveWorkflowRun(runId, sha, branch, login, repositoryName, event, checks_run);
+    await saveWorkflowRun(runId, sha, branch, owner, repositoryName, event, checks_run);
     return;
   } catch (error) {
     app.log.error(error);
