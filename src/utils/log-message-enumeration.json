@@ -12,5 +12,9 @@
             "##[error]"
         ],
         "successMessage": "Finish command"
+    },
+    "SAST_PIPELINE": {
+        "errorMessage": [],
+        "successMessage": "Finish command"
     }
 }
