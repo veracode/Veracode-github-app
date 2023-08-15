@@ -15,10 +15,10 @@ module.exports = async (app, { getRouter }) => {
     handleRegisterWorkflow.bind(null, app)
   );
 
-  // app.on(
-  //   'workflow_run.completed', 
-  //   handleCompletedRun.bind(null, app)
-  // );
+  app.on(
+    'workflow_run.completed', 
+    handleCompletedRun.bind(null, app)
+  );
 
   // app.on([
   //   "installation",
