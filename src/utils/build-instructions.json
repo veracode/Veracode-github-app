@@ -29,7 +29,7 @@
   ],
   "Kotlin": [
     {
-      "build_tool": "build.gradle",
+      "build_tool": "build.gradle.kts",
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "java-gradle-pipeline-scan",
         "veracode_sast_policy_scan": "java-gradle-policy-scan"
@@ -39,7 +39,7 @@
   ],
   "Scala": [
     {
-      "build_tool": "build.gradle",
+      "build_tool": "build.sbt",
       "repository_dispatch_type": {
         "veracode_sast_pipeline_scan": "scala-pipeline-scan",
         "veracode_sast_policy_scan": "scala-policy-scan"
