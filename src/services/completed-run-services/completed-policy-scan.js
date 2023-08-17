@@ -3,7 +3,7 @@ const { updateChecksForCompletedSastScan } =
 const { isJavaMavenRepo } = require('./is-java-maven-repo');
 
 async function updateChecksForCompletedPolicyScan (app, run, context, veracodeScanConfigs) {
-  const javaMaven = isJavaMavenRepo(app, context, run, 'veracode_sast_policy_scan');
+  const javaMaven = await isJavaMavenRepo(app, context, run, 'veracode_sast_policy_scan');
   const filePathPrefix = javaMaven ? 'src/main/java/' : '';
 
   const policyScanConfig = {
