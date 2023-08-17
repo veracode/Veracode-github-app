@@ -110,5 +110,6 @@ async function getCompilationWorkflowEvent(app, buildInstructions, octokit, owne
 } 
 
 module.exports = {
-  getAutoBuildEvent
+  getAutoBuildEvent,
+  getAutoBuildEventByLanguage
 }
