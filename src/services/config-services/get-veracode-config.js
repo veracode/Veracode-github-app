@@ -52,6 +52,34 @@ async function getVeracodeConfigFromRepo(app, octokit, owner, repository) {
   return veracodeConfig;
 }
 
+async function getEnabledRepositoriesFromOrg(app, context) {
+  const octokit = context.octokit;
+  const owner = context.payload.repository.owner.login;
+  const enabledRepositoriesFile = await getEnabledRepositoriesFileFromOrg(app, octokit, owner, appConfig().defaultOrganisationRepository);
+  if (enabledRepositoriesFile === null) return null;
+
+  const fileContents = Buffer.from(enabledRepositoriesFile.data.content, 'base64').toString();
+  const enabledRepositories = fileContents.split('\n');
+  return enabledRepositories;
+}
+
+async function getEnabledRepositoriesFileFromOrg(app, octokit, owner, repository) {
+  let enabledRepositoriesFile;
+  try {
+    enabledRepositoriesFile = await octokit.repos.getContent({
+      owner,
+      repo: repository,
+      path: appConfig().veracodeEnabledRepoFile,
+    });
+  } catch (error) {
+    app.log.error(`${appConfig().veracodeEnabledRepoFile} not found`);
+    return null;
+  }
+
+  return enabledRepositoriesFile;
+}
+
 module.exports = {
-  getVeracodeScanConfig
+  getVeracodeScanConfig,
+  getEnabledRepositoriesFromOrg
 }

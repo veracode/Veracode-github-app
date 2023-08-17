@@ -1,7 +1,7 @@
 const { shouldRunForRepository } = require('../services/config-services/should-run');
 const { getDispatchEvents } = require('../services/dispatch-event-services/get-dispatch-events');
 const { createDispatchEvent } = require('../services/dispatch-event-services/dispatch');
-const { getVeracodeScanConfig } = require('../services/config-services/get-veracode-config');
+const { getVeracodeScanConfig, getEnabledRepositoriesFromOrg } = require('../services/config-services/get-veracode-config');
 const appConfig = require('../app-config');
 
 async function handleEvents(app, context) {
@@ -14,6 +14,10 @@ async function handleEvents(app, context) {
   // 2. handle repository archiving - will not trigger the process
   //    although we should not expect to see push event from an archived repository
   if (deleted || archived) return;
+  
+  // 3. handle enabled repositories
+  const enabledRepositories = await getEnabledRepositoriesFromOrg(app, context);
+  if (enabledRepositories !== null && !enabledRepositories.includes(repoName)) return;
 
   // 3. handle excluded repositories
   const excludedRepositories = [appConfig().defaultOrganisationRepository];
