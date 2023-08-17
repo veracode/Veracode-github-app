@@ -17,7 +17,7 @@ async function updateChecksForCompletedPipelineScan (run, context) {
         `;
         annotations.push({
           // TODO: get rid of src/main/java
-          path: `src/main/java/${element.files.source_file.file}`,
+          path: `${element.files.source_file.file}`,
           start_line: element.files.source_file.line,
           end_line: element.files.source_file.line,
           annotation_level: "warning",

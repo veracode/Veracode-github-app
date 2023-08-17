@@ -15,7 +15,7 @@ async function updateChecksForCompletedPolicyScan (run, context, veracodeScanCon
         const displayMessage = finding.description.replace(/\<span\>/g, '').replace(/\<\/span\> /g, '\n').replace(/\<\/span\>/g, '');
         const message = `Filename: ${finding.finding_details.file_path}\nLine: ${finding.finding_details.file_line_number}\nCWE: ${finding.finding_details.cwe.id} (${finding.finding_details.cwe.name})\n\n${displayMessage}`;
         annotations.push({
-          path: `src/main/java/${finding.finding_details.file_path}`,
+          path: `${finding.finding_details.file_path}`,
           start_line: finding.finding_details.file_line_number,
           end_line: finding.finding_details.file_line_number,
           annotation_level: "warning",
