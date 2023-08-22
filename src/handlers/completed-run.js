@@ -11,6 +11,7 @@ const {
 } = require('../services/completed-run-services/completed-policy-scan');
 const { handleErrorInScan } = require('../services/completed-run-services/handle-error-in-scan');
 const { getVeracodeScanConfig } = require('../services/config-services/get-veracode-config');
+const { getWorkflowRunArtifact } = require('../services/completed-run-services/get-workflow-run-artifacts');
 
 async function handleCompletedRun(app, context) {
   if (!context.payload.workflow_run.id) return;
@@ -19,8 +20,24 @@ async function handleCompletedRun(app, context) {
   const workflow_repo_name = context.payload.repository.name;
   const workflow_repo_run_id = context.payload.workflow_run.id;
 
-  const run = await getWorkflowRunById(app, workflow_repo_run_id);
-  if (!run) return
+  let run = await getWorkflowRunById(app, workflow_repo_run_id); 
+
+  if (!run) {
+    const workflowMetadata = await getWorkflowRunArtifact(context, 'workflow-metadata', 'workflow-metadata.json');
+  
+    if (!workflowMetadata) {
+      app.log.info(`This run is neither found in DB nor in Workflow metadata. Run ID: ${workflow_repo_run_id}`);
+      return;
+    }
+  
+    run = {
+      repository_owner: workflow_reopo_owner,
+      repository_name: workflowMetadata.repository_name,
+      check_run_type: workflowMetadata.check_run_type,
+      check_run_id: workflowMetadata.check_run_id,
+      run_id: workflow_repo_run_id,
+    };
+  }
   app.log.info(run);
 
   const runConclusion = context.payload.workflow_run?.conclusion;

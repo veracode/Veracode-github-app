@@ -15,5 +15,6 @@ function appConfig() {
     cosmodbUri: process.env.COSMOSDB_URI ?? 'mongodb://localhost:27017',
     dbName: process.env.COSMOSDB_DBNAME ?? 'veracode-github-app',
     cloudVendor: process.env.CLOUD_VENDOR ?? 'aws',
+    artifactFolder: process.env.ARTIFACT_FOLDER ?? '/tmp/veracode',
   };
 }
