@@ -31,8 +31,9 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs) {
         });
       } else {
         const buildInstruction = await getAutoBuildEvent(app, context, scanType);
+        const eventTrigger = buildInstruction.repository_dispatch_type[scanType];
         dispatchEvents.push({
-          event_type: scanEventType,
+          event_type: eventTrigger === 'veracode-not-supported' ? eventTrigger : scanEventType,
           repository: default_organization_repository,
           event_trigger: buildInstruction.repository_dispatch_type[scanType],
           modules_to_scan: veracodeScanConfigs[scanType].modules_to_scan,
