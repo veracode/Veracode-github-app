@@ -3,7 +3,7 @@ const appConfig = require('../../app-config');
 const { getVeracodeScanConfig } = require('../config-services/get-veracode-config');
 
 
-async function handleCompletedCompilation (app, run, context) {
+async function handleCompletedCompilation (app, run, context, veracodeScanConfigs) {
   const data = {
     owner: run.repository_owner,
     repo: run.repository_name,
@@ -43,7 +43,7 @@ async function handleCompletedCompilation (app, run, context) {
     }
   }
 
-  const veracodeScanConfigs = await getVeracodeScanConfig(app, context);
+  // const veracodeScanConfigs = await getVeracodeScanConfig(app, context);
   const subsequentScanType = run.check_run_type.substring(27);
   const subsequentScanTypeUnderscore = subsequentScanType.replaceAll(/-/g, '_');
   const dispatchEvents = [{

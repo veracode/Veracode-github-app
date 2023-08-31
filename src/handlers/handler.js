@@ -1,7 +1,8 @@
 const { shouldRunForRepository } = require('../services/config-services/should-run');
 const { getDispatchEvents } = require('../services/dispatch-event-services/get-dispatch-events');
 const { createDispatchEvent } = require('../services/dispatch-event-services/dispatch');
-const { getVeracodeScanConfig, getEnabledRepositoriesFromOrg } = require('../services/config-services/get-veracode-config');
+const { getVeracodeScanConfig, 
+  getEnabledRepositoriesFromOrg, getAppConfigFromRepo } = require('../services/config-services/get-veracode-config');
 const appConfig = require('../app-config');
 
 async function handleEvents(app, context) {
@@ -19,20 +20,23 @@ async function handleEvents(app, context) {
   const enabledRepositories = await getEnabledRepositoriesFromOrg(app, context);
   if (enabledRepositories !== null && !enabledRepositories.includes(repoName)) return;
 
-  // 3. handle excluded repositories
+  // 4. handle excluded repositories
   const excludedRepositories = [appConfig().defaultOrganisationRepository];
   if(!shouldRunForRepository(repoName, excludedRepositories))
     return;
 
+  // 5. get app config from default organisation repository
+  const veracodeAppConfig = await getAppConfigFromRepo(app, context);
+
   const branch = context.name === 'push' ? 
     context.payload.ref.replace('refs/heads/', '') : context.payload.pull_request.head.ref;
 
-  // 4. handle veracode yml auto pr branch
+  // 6. handle veracode yml auto pr branch
   if (branch === appConfig().prBranch) return;
 
   const sha = context.name === 'push' ? context.payload.after : context.payload.pull_request.head.sha;
 
-  const veracodeScanConfigs = await getVeracodeScanConfig(app, context);
+  const veracodeScanConfigs = await getVeracodeScanConfig(app, context, veracodeAppConfig);
   const dispatchEvents = await getDispatchEvents(app, context, branch, veracodeScanConfigs);
 
   const api = context.octokit;

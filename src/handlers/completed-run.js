@@ -10,7 +10,7 @@ const {
   updateChecksForCompletedPolicyScan, 
 } = require('../services/completed-run-services/completed-policy-scan');
 const { handleErrorInScan } = require('../services/completed-run-services/handle-error-in-scan');
-const { getVeracodeScanConfig } = require('../services/config-services/get-veracode-config');
+const { getAppConfigFromRepo, getVeracodeScanConfig } = require('../services/config-services/get-veracode-config');
 const { getWorkflowRunArtifact } = require('../services/completed-run-services/get-workflow-run-artifacts');
 
 async function handleCompletedRun(app, context) {
@@ -36,12 +36,14 @@ async function handleCompletedRun(app, context) {
       check_run_type: workflowMetadata.check_run_type,
       check_run_id: workflowMetadata.check_run_id,
       run_id: workflow_repo_run_id,
+      sha: workflowMetadata.sha,
     };
   }
   app.log.info(run);
 
   const runConclusion = context.payload.workflow_run?.conclusion;
-  const veracodeScanConfigs = await getVeracodeScanConfig(app, context);
+  const veracodeAppConfig = await getAppConfigFromRepo(app, context);
+  const veracodeScanConfigs = await getVeracodeScanConfig(app, context, veracodeAppConfig);
 
   if (runConclusion === 'failure') {
     const url = `GET /repos/${workflow_reopo_owner}/${workflow_repo_name}/actions/runs/${workflow_repo_run_id}/jobs`
@@ -53,7 +55,7 @@ async function handleCompletedRun(app, context) {
   }
 
   if (run.check_run_type.substring(0, 26) === 'veracode-local-compilation') 
-    handleCompletedCompilation(app, run, context);
+    handleCompletedCompilation(app, run, context, veracodeScanConfigs);
   else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-iac-secrets-scan')
     await updateChecksForCompletedScan(run, context, veracodeScanConfigs);
   else if (run.check_run_type === 'veracode-sast-policy-scan') /* This section handles SAST */

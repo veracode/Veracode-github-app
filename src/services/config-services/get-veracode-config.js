@@ -2,18 +2,18 @@ const appConfig = require('../../app-config');
 const fs = require('fs');
 const yaml = require('js-yaml');
 
-async function getVeracodeScanConfig(app, context) {
+async function getVeracodeScanConfig(app, context, veracodeAppConfig) {
   const octokit = context.octokit;
   const owner = context.payload.repository.owner.login;
   const originalRepo = context.payload.repository.name;
   let veracodeScanConfigs;
   // 1. get veracode.yml from original repository
-  let veracodeConfigFromRepo = await getVeracodeConfigFromRepo(
-    app, octokit, owner, originalRepo);
+  let veracodeConfigFromRepo = await getConfigFileFromRepo(
+    app, octokit, owner, originalRepo, veracodeAppConfig.scan_config_file_location);
   // 2. if veracode.yml does not exist in original repository, get veracode.yml from default organization repository
   if (veracodeConfigFromRepo === null) 
-    veracodeConfigFromRepo = await getVeracodeConfigFromRepo(
-      app, octokit, owner, appConfig().defaultOrganisationRepository);
+    veracodeConfigFromRepo = await getConfigFileFromRepo(
+      app, octokit, owner, appConfig().defaultOrganisationRepository, veracodeAppConfig.scan_config_file_location);
 
   if (veracodeConfigFromRepo === null) {
     try {
@@ -36,26 +36,12 @@ async function getVeracodeScanConfig(app, context) {
   return veracodeScanConfigs;
 }
 
-async function getVeracodeConfigFromRepo(app, octokit, owner, repository) {
-  let veracodeConfig; 
-  try {
-    veracodeConfig = await octokit.repos.getContent({
-      owner,
-      repo: repository,
-      path: appConfig().veracodeConfigFile,
-    });
-  } catch (error) {
-    app.log.info(`${appConfig().veracodeConfigFile} not found`);
-    return null;
-  }
-
-  return veracodeConfig;
-}
-
 async function getEnabledRepositoriesFromOrg(app, context) {
   const octokit = context.octokit;
   const owner = context.payload.repository.owner.login;
-  const enabledRepositoriesFile = await getEnabledRepositoriesFileFromOrg(app, octokit, owner, appConfig().defaultOrganisationRepository);
+
+  const enabledRepositoriesFile = await getConfigFileFromRepo(app, octokit, owner,
+    appConfig().defaultOrganisationRepository, appConfig().veracodeEnabledRepoFile);
   if (enabledRepositoriesFile === null) return null;
 
   const fileContents = Buffer.from(enabledRepositoriesFile.data.content, 'base64').toString();
@@ -63,23 +49,41 @@ async function getEnabledRepositoriesFromOrg(app, context) {
   return enabledRepositories;
 }
 
-async function getEnabledRepositoriesFileFromOrg(app, octokit, owner, repository) {
-  let enabledRepositoriesFile;
+async function getAppConfigFromRepo(app, context) {
+  const octokit = context.octokit;
+  const owner = context.payload.repository.owner.login;
+  const defaultAppConfig = {
+    scan_config_file_location: 'veracode.yml'
+  };
+  const appConfigFile = await getConfigFileFromRepo(app, octokit, owner, 
+    appConfig().defaultOrganisationRepository, appConfig().appConfigFile);
+  if (appConfigFile === null) return defaultAppConfig;
   try {
-    enabledRepositoriesFile = await octokit.repos.getContent({
+    const fileContents = Buffer.from(appConfigFile.data.content, 'base64').toString();
+    return yaml.load(fileContents);
+  } catch (e) {
+    app.log.error(e);
+    return defaultAppConfig;
+  }
+}
+
+async function getConfigFileFromRepo(app, octokit, owner, repository, configFile) {
+  let config;
+  try {
+    config = await octokit.repos.getContent({
       owner,
       repo: repository,
-      path: appConfig().veracodeEnabledRepoFile,
+      path: configFile,
     });
   } catch (error) {
-    app.log.error(`${appConfig().veracodeEnabledRepoFile} not found`);
+    app.log.error(`${configFile} not found in repo ${repository}`);
     return null;
   }
-
-  return enabledRepositoriesFile;
+  return config;
 }
 
 module.exports = {
   getVeracodeScanConfig,
-  getEnabledRepositoriesFromOrg
+  getEnabledRepositoriesFromOrg,
+  getAppConfigFromRepo
 }
