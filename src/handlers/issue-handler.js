@@ -65,8 +65,15 @@ async function handleIssueEvents(app, context) {
     });
     let branch = undefined;
     if (branchName) {
-      branch = await getBranchByName(app, context, branchName);
-    } else {
+      try {
+        branch = await getBranchByName(app, context, branchName);
+      } catch (error) {
+        branch = undefined;
+      }
+    } 
+    
+    if (!branch) {
+      app.log.info(`Branch ${branchName} not found, using default branch`);
       branch = await getBranchByName(app, context, context.payload.repository.default_branch);
     }
 
