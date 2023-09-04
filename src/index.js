@@ -3,6 +3,7 @@ const { handleCompletedRun } = require('./handlers/completed-run');
 const { handleEvents } = require('./handlers/handler');
 const handleInstallationRepositories = require('./handlers/installation');
 const { handleRegisterWorkflow } = require('./handlers/register-workflow');
+const { handleIssueEvents } = require('./handlers/issue-handler');
 
 module.exports = async (app, { getRouter }) => {
   app.on(
@@ -31,10 +32,10 @@ module.exports = async (app, { getRouter }) => {
   // app.on('pull_request.opened', async (context) => {
   //   console.log(context);
   // });
-
-  app.on('issues.opened', async context => {
-    app.log.info(context);
-  });
+  app.on(
+    ['issues.opened', 'issues.edited', 'issue_comment.created', 'issue_comment.edited'], 
+    handleIssueEvents.bind(null, app)
+  );
 
   const router = getRouter('');
   router.get('/register', (req, res) => {

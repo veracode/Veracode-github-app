@@ -1,10 +1,8 @@
-const fs = require('fs');
-const yaml = require('js-yaml');
-const { default_organization_repository } = require('../../utils/constants');
 const { getAutoBuildEvent } = require('./get-auto-build-event');
-const { shouldRunScanType } = require('../config-services/should-run');
+const { shouldRunScanType, shouldRunScanTypeForIssue } = require('../config-services/should-run');
+const appConfig = require('../../app-config');
 
-async function getDispatchEvents(app, context, branch, veracodeScanConfigs) {
+async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issueAttributesToCheck = undefined) {
   const originalRepo = context.payload.repository.name;
   const eventName = context.name;
   const defaultBranch = context.payload.repository.default_branch;
@@ -15,8 +13,13 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs) {
   const veracodeConfigKeys = Object.keys(veracodeScanConfigs);
 
   for (const scanType of veracodeConfigKeys) {
-    if (!await shouldRunScanType(eventName, branch, defaultBranch, veracodeScanConfigs[scanType], action, targetBranch))
-      continue;
+    if (eventName === 'issues' || eventName === 'issue_comment') {
+      if (!await shouldRunScanTypeForIssue(veracodeScanConfigs[scanType], issueAttributesToCheck))
+        continue;
+    } else {
+      if (!await shouldRunScanType(eventName, branch, defaultBranch, veracodeScanConfigs[scanType], action, targetBranch))
+        continue;
+    }
     const scanEventType = scanType.replaceAll(/_/g, '-');
     
     // for sast scan, if compile_locally is true, dispatch to local compilation workflow
@@ -34,7 +37,7 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs) {
         const eventTrigger = buildInstruction.repository_dispatch_type[scanType];
         dispatchEvents.push({
           event_type: eventTrigger === 'veracode-not-supported' ? eventTrigger : scanEventType,
-          repository: default_organization_repository,
+          repository: appConfig().defaultOrganisationRepository,
           event_trigger: buildInstruction.repository_dispatch_type[scanType],
           modules_to_scan: veracodeScanConfigs[scanType].modules_to_scan,
         });
@@ -44,13 +47,13 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs) {
       if (buildInstruction.veracode_sca_scan === 'true')
         dispatchEvents.push({
           event_type: scanEventType,
-          repository: default_organization_repository,
+          repository: appConfig().defaultOrganisationRepository,
           event_trigger: scanEventType,
         });
     } else {
       dispatchEvents.push({
         event_type: scanEventType,
-        repository: default_organization_repository,
+        repository: appConfig().defaultOrganisationRepository,
         event_trigger: scanEventType,
       });
     }

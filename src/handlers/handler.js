@@ -16,17 +16,24 @@ async function handleEvents(app, context) {
   //    although we should not expect to see push event from an archived repository
   if (deleted || archived) return;
   
-  // 3. handle enabled repositories
+  // 3. handle enabled repositories - if file exists and the repository is not enabled, will not trigger the process
   const enabledRepositories = await getEnabledRepositoriesFromOrg(app, context);
   if (enabledRepositories !== null && !enabledRepositories.includes(repoName)) return;
 
-  // 4. handle excluded repositories
+  // 4. handle excluded repositories - if repository is excluded, will not trigger the process
   const excludedRepositories = [appConfig().defaultOrganisationRepository];
   if(!shouldRunForRepository(repoName, excludedRepositories))
     return;
 
   // 5. get app config from default organisation repository
   const veracodeAppConfig = await getAppConfigFromRepo(app, context);
+  const veracodeScanConfigs = await getVeracodeScanConfig(app, context, veracodeAppConfig);
+
+  const api = context.octokit;
+  const token = await api.apps.createInstallationAccessToken({
+    installation_id: installationId,
+    repository_ids: [repoId]
+  })
 
   const branch = context.name === 'push' ? 
     context.payload.ref.replace('refs/heads/', '') : context.payload.pull_request.head.ref;
@@ -34,17 +41,8 @@ async function handleEvents(app, context) {
   // 6. handle veracode yml auto pr branch
   if (branch === appConfig().prBranch) return;
 
-  const sha = context.name === 'push' ? context.payload.after : context.payload.pull_request.head.sha;
-
-  const veracodeScanConfigs = await getVeracodeScanConfig(app, context, veracodeAppConfig);
   const dispatchEvents = await getDispatchEvents(app, context, branch, veracodeScanConfigs);
-
-  const api = context.octokit;
-
-  const token = await api.apps.createInstallationAccessToken({
-    installation_id: installationId,
-    repository_ids: [repoId]
-  })
+  const sha = context.name === 'push' ? context.payload.after : context.payload.pull_request.head.sha;
 
   const dispatchEventData = {
     context,
