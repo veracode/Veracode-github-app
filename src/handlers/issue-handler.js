@@ -54,7 +54,7 @@ async function handleIssueEvents(app, context) {
   for (let index = 0; index < dispatchEvents.length; index++) {
     const dispatchEvent = dispatchEvents[index];
     let branchName = '';
-    const branchRegex = /branch:\s*(\w+)/;
+    const branchRegex = /branch:\s*([\w-]+)/;
     attributesToCheck.forEach(attribute => {
       const match = attribute.match(branchRegex);
 
