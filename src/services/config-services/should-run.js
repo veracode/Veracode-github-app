@@ -77,8 +77,19 @@ function shouldRunScanType(eventName, branch, defaultBranch, veracodeScanConfig,
   return false;
 }
 
+function shouldRunScanTypeForIssue(veracodeScanConfig, issueAttributeValuesToCheck) {
+  if (veracodeScanConfig.issue?.trigger === true) {
+    for (const attributeValue of issueAttributeValuesToCheck)
+      for (const command of veracodeScanConfig.issue?.commands)
+        if (attributeValue.includes(command)) return true;
+  }
+  // if issue not exist, or issue trigger is not set to true, or none of the attributes match, return false
+  return false;
+}
+
 module.exports = {
   shouldRunForRepository,
   shouldRunForBranch,
   shouldRunScanType,
+  shouldRunScanTypeForIssue,
 }

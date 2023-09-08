@@ -1,7 +1,7 @@
 const fs = require("fs-extra");
 const AdmZip = require("adm-zip");
-const { artifact_folder } = require('../../utils/constants');
 const { updateChecks } = require('./checks');
+const appConfig = require('../../app-config');
 
 async function updateChecksForCompletedSastScan(run, context, scanConfig, veracodeScanConfigs = undefined) {
   const workflow_reopo_owner = context.payload.repository.owner.login;
@@ -48,8 +48,8 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig, veraco
     }
     const timestamp = new Date().toISOString();
     const artifactName = `${run.repository_owner}-${run.repository_name}-${timestamp}`;
-    const artifactFilename = `${artifact_folder}/${artifactName}.zip`;
-    const destination = `${artifact_folder}/${artifactName}`;
+    const artifactFilename = `${appConfig().artifactFolder}/${artifactName}.zip`;
+    const destination = `${appConfig().artifactFolder}/${artifactName}`;
 
     if (!fs.existsSync(destination)) {
       fs.mkdirSync(destination, { recursive: true });
