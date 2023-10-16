@@ -27,6 +27,24 @@
       "veracode_sca_scan": "true"
     }
   ],
+  "Kotlin": [
+    {
+      "build_tool": "pom.xml",
+      "repository_dispatch_type": {
+        "veracode_sast_pipeline_scan": "java-maven-pipeline-scan",
+        "veracode_sast_policy_scan": "java-maven-policy-scan"
+      },
+      "veracode_sca_scan": "true"
+    },
+    {
+      "build_tool": "build.gradle",
+      "repository_dispatch_type": {
+        "veracode_sast_pipeline_scan": "java-gradle-pipeline-scan",
+        "veracode_sast_policy_scan": "java-gradle-policy-scan"
+      },
+      "veracode_sca_scan": "true"
+    }
+  ],
   "JavaScript": [
     {
       "build_tool": "NA",
