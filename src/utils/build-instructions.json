@@ -79,8 +79,8 @@
     {
       "build_tool": "NA",
       "repository_dispatch_type": {
-        "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
-        "veracode_sast_policy_scan": "source-code-policy-scan"
+        "veracode_sast_pipeline_scan": "plsql-pipeline-scan",
+        "veracode_sast_policy_scan": "plsql-policy-scan"
       },
       "veracode_sca_scan": "false"
     }
@@ -89,8 +89,8 @@
     {
       "build_tool": "NA",
       "repository_dispatch_type": {
-        "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
-        "veracode_sast_policy_scan": "source-code-policy-scan"
+        "veracode_sast_pipeline_scan": "tsql-pipeline-scan",
+        "veracode_sast_policy_scan": "tsql-policy-scan"
       },
       "veracode_sca_scan": "false"
     }
@@ -109,8 +109,8 @@
     {
       "build_tool": "NA",
       "repository_dispatch_type": {
-        "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
-        "veracode_sast_policy_scan": "source-code-policy-scan"
+        "veracode_sast_pipeline_scan": "php-pipeline-scan",
+        "veracode_sast_policy_scan": "php-policy-scan"
       },
       "veracode_sca_scan": "true"
     }
@@ -119,8 +119,8 @@
     {
       "build_tool": "NA",
       "repository_dispatch_type": {
-        "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
-        "veracode_sast_policy_scan": "source-code-policy-scan"
+        "veracode_sast_pipeline_scan": "perl-pipeline-scan",
+        "veracode_sast_policy_scan": "perl-policy-scan"
       },
       "veracode_sca_scan": "false"
     }
@@ -129,8 +129,8 @@
     {
       "build_tool": "NA",
       "repository_dispatch_type": {
-        "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
-        "veracode_sast_policy_scan": "source-code-policy-scan"
+        "veracode_sast_pipeline_scan": "ruby-pipeline-scan",
+        "veracode_sast_policy_scan": "ruby-policy-scan"
       },
       "veracode_sca_scan": "true"
     }
@@ -149,8 +149,8 @@
     {
       "build_tool": "NA",
       "repository_dispatch_type": {
-        "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
-        "veracode_sast_policy_scan": "source-code-policy-scan"
+        "veracode_sast_pipeline_scan": "vb6-pipeline-scan",
+        "veracode_sast_policy_scan": "vb6-policy-scan"
       },
       "veracode_sca_scan": "false"
     }
@@ -159,8 +159,8 @@
     {
       "build_tool": "NA",
       "repository_dispatch_type": {
-        "veracode_sast_pipeline_scan": "source-code-pipeline-scan",
-        "veracode_sast_policy_scan": "source-code-policy-scan"
+        "veracode_sast_pipeline_scan": "apex-pipeline-scan",
+        "veracode_sast_policy_scan": "apex-policy-scan"
       },
       "veracode_sca_scan": "false"
     }
