@@ -104,7 +104,7 @@ async function updateChecksForCompletedSastScan(run, context, scanConfig, veraco
         summary: `Here\'s the summary of the check result, the full report can be found [here](${resultsUrl}).`
       }, 'success');
       return;
-    } else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-iac-secrets-scan') {
+    } else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-iac-secrets-scan' || run.check_run_type === 'veracode-not-supported') {
       /* If the scan is a SCA / IAC scan, and the workflow job returned successful, it means no policy violation */
       updateChecks(run, context, {
         annotations: [],
