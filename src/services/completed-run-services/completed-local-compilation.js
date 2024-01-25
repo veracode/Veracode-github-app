@@ -50,7 +50,9 @@ async function handleCompletedCompilation (app, run, context, veracodeScanConfig
     event_type: subsequentScanType,
     repository: appConfig().defaultOrganisationRepository,
     event_trigger: `binary-ready-${subsequentScanType}`,
-    modules_to_scan: veracodeScanConfigs[subsequentScanTypeUnderscore].modules_to_scan
+    modules_to_scan: veracodeScanConfigs[subsequentScanTypeUnderscore].modules_to_scan,
+    fail_checks_on_policy: veracodeScanConfigs[subsequentScanTypeUnderscore].break_build_policy_findings,
+    fail_checks_on_error: veracodeScanConfigs[subsequentScanTypeUnderscore].break_build_on_error,
   }]
 
   let requests = dispatchEvents.map(event => createDispatchEvent(event, dispatchEventData));

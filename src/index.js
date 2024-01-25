@@ -11,10 +11,11 @@ module.exports = async (app, { getRouter }) => {
     handleEvents.bind(null, app)
   );
 
-  app.on(
-    'workflow_run.in_progress', 
-    handleRegisterWorkflow.bind(null, app)
-  );
+  // No longer in Use
+  // app.on(
+  //   'workflow_run.in_progress', 
+  //   handleRegisterWorkflow.bind(null, app)
+  // );
 
   app.on(
     'workflow_run.completed', 

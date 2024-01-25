@@ -9,6 +9,10 @@ const createDispatchEvent = async function (event, dispatchEventData) {
       event: context.payload,
       event_type: event.event_type,
       modules_to_scan: event.modules_to_scan ?? '',
+      fail_checks: {
+        fail_checks_on_policy: event.fail_checks_on_policy ?? false,
+        fail_checks_on_error: event.fail_checks_on_error ?? false,
+      }
     }
   });
 }
