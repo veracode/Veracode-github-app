@@ -31,6 +31,8 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issu
           event_type: `veracode-local-compilation-${scanEventType}`,
           repository: originalRepo,
           event_trigger: veracodeScanConfigs[scanType].local_compilation_workflow,
+          fail_checks_on_policy: veracodeScanConfigs[scanType].break_build_policy_findings,
+          fail_checks_on_error: veracodeScanConfigs[scanType].break_build_on_error,
         });
       } else {
         const buildInstruction = await getAutoBuildEvent(app, context, scanType);
@@ -40,6 +42,8 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issu
           repository: appConfig().defaultOrganisationRepository,
           event_trigger: buildInstruction.repository_dispatch_type[scanType],
           modules_to_scan: veracodeScanConfigs[scanType].modules_to_scan,
+          fail_checks_on_policy: veracodeScanConfigs[scanType].break_build_policy_findings,
+          fail_checks_on_error: veracodeScanConfigs[scanType].break_build_on_error,
         });
       }
     } else if(scanEventType.includes('sca-scan')) {
@@ -49,12 +53,16 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issu
           event_type: scanEventType,
           repository: appConfig().defaultOrganisationRepository,
           event_trigger: scanEventType,
+          fail_checks_on_policy: veracodeScanConfigs[scanType].break_build_policy_findings,
+          fail_checks_on_error: veracodeScanConfigs[scanType].break_build_on_error,
         });
     } else {
       dispatchEvents.push({
         event_type: scanEventType,
         repository: appConfig().defaultOrganisationRepository,
         event_trigger: scanEventType,
+        fail_checks_on_policy: veracodeScanConfigs[scanType].break_build_policy_findings,
+        fail_checks_on_error: veracodeScanConfigs[scanType].break_build_on_error,
       });
     }
   }

@@ -53,7 +53,8 @@ async function getAppConfigFromRepo(app, context) {
   const octokit = context.octokit;
   const owner = context.payload.repository.owner.login;
   const defaultAppConfig = {
-    scan_config_file_location: 'veracode.yml'
+    scan_config_file_location: 'veracode.yml',
+    process_scan_results_in_action: false,
   };
   const appConfigFile = await getConfigFileFromRepo(app, octokit, owner, 
     appConfig().defaultOrganisationRepository, appConfig().appConfigFile);

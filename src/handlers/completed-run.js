@@ -58,10 +58,15 @@ async function handleCompletedRun(app, context) {
     handleCompletedCompilation(app, run, context, veracodeScanConfigs);
   else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-iac-secrets-scan')
     await updateChecksForCompletedScan(run, context, veracodeScanConfigs);
-  else if (run.check_run_type === 'veracode-sast-policy-scan') /* This section handles SAST */
+  else if (run.check_run_type === 'veracode-sast-policy-scan') /* This section handles SAST */ {
+    if (veracodeAppConfig.process_scan_results_in_action) return;
     updateChecksForCompletedPolicyScan(app, run, context, veracodeScanConfigs);
-  else
+  }
+  else {
+    if (veracodeAppConfig.process_scan_results_in_action) return;
     updateChecksForCompletedPipelineScan(app, run, context, veracodeScanConfigs);
+  }
+    
 }
 
 module.exports = {
