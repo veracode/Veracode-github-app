@@ -13,6 +13,11 @@ const { handleErrorInScan } = require('../services/completed-run-services/handle
 const { getAppConfigFromRepo, getVeracodeScanConfig } = require('../services/config-services/get-veracode-config');
 const { getWorkflowRunArtifact } = require('../services/completed-run-services/get-workflow-run-artifacts');
 
+const runTypesNotRequiringErrorHandlingOrResultProcessing = [
+  'veracode-remove-sandbox',
+  'veracode-not-supported',
+]
+
 async function handleCompletedRun(app, context) {
   if (!context.payload.workflow_run.id) return;
 
@@ -40,6 +45,8 @@ async function handleCompletedRun(app, context) {
     };
   }
   app.log.info(run);
+
+  if (runTypesNotRequiringErrorHandlingOrResultProcessing.includes(run.check_run_type)) return;
 
   const runConclusion = context.payload.workflow_run?.conclusion;
   const veracodeAppConfig = await getAppConfigFromRepo(app, context);
