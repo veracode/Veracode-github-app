@@ -42,7 +42,7 @@ async function handleEvents(app, context) {
 
   let dispatchEvents = [];
   // 5.5 if the pull request is closed, dispatch an event to remove the sandbox
-  if ((context.name === 'pull_request' && context.payload.action === 'closed') ||
+  if ((context.name === 'pull_request' && context.payload.action === 'closed' && context.payload.pull_request?.merged) ||
      (context.name === 'push' && deleted))
     dispatchEvents.push({
       event_type: 'veracode-remove-sandbox',
