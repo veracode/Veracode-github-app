@@ -2,12 +2,14 @@ const { getAutoBuildEvent } = require('./get-auto-build-event');
 const { shouldRunScanType, shouldRunScanTypeForIssue } = require('../config-services/should-run');
 const appConfig = require('../../app-config');
 
-async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issueAttributesToCheck = undefined) {
+async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issueAttributesToCheck = undefined, veracodeScanConfig = undefined) {
   const originalRepo = context.payload.repository.name;
   const eventName = context.name;
   const defaultBranch = context.payload.repository.default_branch;
   const action = context.payload.action ?? 'null';
   const targetBranch = context.payload.pull_request?.base?.ref ?? null;
+  const veracode_sandbox_scan_workflow = veracodeScanConfig?.veracode_sandbox_scan_workflow ?? false; // Feature Flag Check
+
 
   let dispatchEvents = [];
   const veracodeConfigKeys = Object.keys(veracodeScanConfigs);
@@ -21,7 +23,7 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issu
         continue;
     }
     const scanEventType = scanType.replaceAll(/_/g, '-');
-    
+
     // for sast scan, if compile_locally is true, dispatch to local compilation workflow
     // otherwise, dispatch to default organization repository with auto build
     // for non sast scan, simply dispatch to default organization repository
@@ -37,17 +39,19 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issu
       } else {
         const buildInstruction = await getAutoBuildEvent(app, context, scanType);
         const eventTrigger = buildInstruction.repository_dispatch_type[scanType];
-        dispatchEvents.push({
-          event_type: eventTrigger === 'veracode-not-supported' ? eventTrigger : scanEventType,
-          repository: appConfig().defaultOrganisationRepository,
-          event_trigger: eventTrigger,
-          modules_to_scan: veracodeScanConfigs[scanType].modules_to_scan,
-          fail_checks_on_policy: veracodeScanConfigs[scanType].break_build_policy_findings,
-          fail_checks_on_error: veracodeScanConfigs[scanType].break_build_on_error,
-        });
+        if (!(eventName === 'pull_request' && veracodeScanConfigs[scanType].push.trigger))
+          dispatchEvents.push({
+            event_type: eventTrigger === 'veracode-not-supported' ? eventTrigger : scanEventType,
+            repository: appConfig().defaultOrganisationRepository,
+            event_trigger: eventTrigger,
+            modules_to_scan: veracodeScanConfigs[scanType].modules_to_scan,
+            fail_checks_on_policy: veracodeScanConfigs[scanType].break_build_policy_findings,
+            fail_checks_on_error: veracodeScanConfigs[scanType].break_build_on_error,
+          });
         const eventNameMatchingConfig = eventName.replaceAll(/issues?(_comment)?/g, 'issue');
-        if (veracodeScanConfigs[scanType][eventNameMatchingConfig]?.run_sandbox_scan_in_parallel && 
-            eventTrigger !== 'veracode-not-supported') {
+        if (veracode_sandbox_scan_workflow &&
+          veracodeScanConfigs[scanType][eventNameMatchingConfig]?.run_sandbox_scan_in_parallel &&
+          eventTrigger !== 'veracode-not-supported') {
           dispatchEvents.push({
             event_type: 'veracode-sast-sandbox-scan',
             repository: appConfig().defaultOrganisationRepository,
@@ -57,7 +61,7 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issu
           });
         }
       }
-    } else if(scanEventType.includes('sca-scan')) {
+    } else if (scanEventType.includes('sca-scan')) {
       const buildInstruction = await getAutoBuildEvent(app, context, scanType);
       if (buildInstruction.veracode_sca_scan === 'true')
         dispatchEvents.push({
@@ -83,4 +87,4 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issu
 
 module.exports = {
   getDispatchEvents,
-}
+};
