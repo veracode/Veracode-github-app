@@ -51,9 +51,8 @@ function shouldRunForTargetBranch(targetBranch, pullRequestTargetBranches) {
 }
 
 function shouldRunScanType(eventName, branch, defaultBranch, veracodeScanConfig, action, targetBranch) {
-  const triggers = [];
-  if (veracodeScanConfig.push.trigger) triggers.push('push');
-  if (veracodeScanConfig.pull_request.trigger) triggers.push('pull_request');
+  const trigger = veracodeScanConfig.pull_request.trigger ? 'pull_request' : veracodeScanConfig.push.trigger ? 'push' : null;
+  if (trigger !== eventName) return;
 
   // check if the event is one of the triggers
   if (!triggers.includes(eventName)) return false;
