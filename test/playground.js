@@ -1,7 +1,3 @@
-const str = 'Veracode SCA - verademo-java-no-config - 6c9ee63bee33c9edc1f7c2ce75106d0a8cad03e6'
-const strList = str.split(' - ')
-console.log(strList);
-
-console.log(str.length);
-
-console.log(str.substring(str.length - 40, str.length));
+const eventName = 'issue_comment';
+const eventNameMatchingConfig = eventName.replaceAll(/issues?(_comment)?/g, 'issue');
+console.log(eventNameMatchingConfig);

@@ -2,7 +2,7 @@ function shouldRunForRepository(repositoryName, exclude) {
   const excludeMatch = exclude.some((repository) => {
     const regex = new RegExp('^' + repository.replace(/\*/g, '.*') + '$');
     return regex.test(repositoryName);
-  });    
+  });
 
   return !excludeMatch;
 }
@@ -51,29 +51,31 @@ function shouldRunForTargetBranch(targetBranch, pullRequestTargetBranches) {
 }
 
 function shouldRunScanType(eventName, branch, defaultBranch, veracodeScanConfig, action, targetBranch) {
-  const trigger = veracodeScanConfig.push.trigger ? 
-    'push' : veracodeScanConfig.pull_request.trigger ? 
-    'pull_request' : '';
-  if (eventName !== trigger) return false;
+  const triggers = [];
+  if (veracodeScanConfig.push.trigger) triggers.push('push');
+  if (veracodeScanConfig.pull_request.trigger) triggers.push('pull_request');
+
+  // check if the event is one of the triggers
+  if (!triggers.includes(eventName)) return false;
 
   // replace the default_branch keyword with the actual default branch name from the config yml
   for (const eventTrigger of ['push', 'pull_request']) {
     for (const attribute of ['branches_to_run', 'branches_to_exclude', 'target_branch']) {
       const attributeValue = veracodeScanConfig?.[eventTrigger]?.[attribute];
-      if (Array.isArray(attributeValue)) 
-        for (let i = 0; i < attributeValue.length; i++) 
-          if (attributeValue[i] === 'default_branch') 
+      if (Array.isArray(attributeValue))
+        for (let i = 0; i < attributeValue.length; i++)
+          if (attributeValue[i] === 'default_branch')
             attributeValue[i] = defaultBranch;
     }
   }
 
-  if (trigger === 'push') 
+  if (eventName === 'push')
     return shouldRunForBranch(branch, veracodeScanConfig.push);
-  
-  if (trigger === 'pull_request' && veracodeScanConfig.pull_request?.action?.includes(action)) {
+
+  if (eventName === 'pull_request' && veracodeScanConfig.pull_request?.action?.includes(action)) {
     return shouldRunForTargetBranch(targetBranch, veracodeScanConfig.pull_request.target_branch);
   }
-  
+
   return false;
 }
 
@@ -92,4 +94,4 @@ module.exports = {
   shouldRunForBranch,
   shouldRunScanType,
   shouldRunScanTypeForIssue,
-}
+};

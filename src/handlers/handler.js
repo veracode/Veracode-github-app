@@ -14,7 +14,8 @@ async function handleEvents(app, context) {
   // 1. handle branch deletion - will not trigger the process
   // 2. handle repository archiving - will not trigger the process
   //    although we should not expect to see push event from an archived repository
-  if (deleted || archived) return;
+  if (archived) return;
+  
   
   // 3. handle enabled repositories - if file exists and the repository is not enabled, will not trigger the process
   const enabledRepositories = await getEnabledRepositoriesFromOrg(app, context);
@@ -37,13 +38,21 @@ async function handleEvents(app, context) {
 
   const branch = context.name === 'push' ? 
     context.payload.ref.replace('refs/heads/', '') : context.payload.pull_request.head.ref;
-
-  // 6. handle veracode yml auto pr branch
-  if (branch === appConfig().prBranch) return;
-
-  const dispatchEvents = await getDispatchEvents(app, context, branch, veracodeScanConfigs);
   const sha = context.name === 'push' ? context.payload.after : context.payload.pull_request.head.sha;
 
+  let dispatchEvents = [];
+  // 5.5 if the pull request is closed, dispatch an event to remove the sandbox
+  if ((context.name === 'pull_request' && context.payload.action === 'closed' && context.payload.pull_request?.merged) ||
+     (context.name === 'push' && deleted))
+    dispatchEvents.push({
+      event_type: 'veracode-remove-sandbox',
+      repository: appConfig().defaultOrganisationRepository,
+      event_trigger: 'veracode-remove-sandbox',
+    });
+  else dispatchEvents = await getDispatchEvents(app, context, branch, veracodeScanConfigs);
+
+  if (branch === appConfig().prBranch) return
+  
   const dispatchEventData = {
     context,
     payload: {
