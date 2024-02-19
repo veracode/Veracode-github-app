@@ -2,12 +2,14 @@ const { getAutoBuildEvent } = require('./get-auto-build-event');
 const { shouldRunScanType, shouldRunScanTypeForIssue } = require('../config-services/should-run');
 const appConfig = require('../../app-config');
 
-async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issueAttributesToCheck = undefined) {
+async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issueAttributesToCheck = undefined, veracodeScanConfig = undefined) {
   const originalRepo = context.payload.repository.name;
   const eventName = context.name;
   const defaultBranch = context.payload.repository.default_branch;
   const action = context.payload.action ?? 'null';
   const targetBranch = context.payload.pull_request?.base?.ref ?? null;
+  const veracode_sandbox_scan_workflow = veracodeScanConfig?.veracode_sandbox_scan_workflow ?? false; // Feature Flag Check
+
 
   let dispatchEvents = [];
   const veracodeConfigKeys = Object.keys(veracodeScanConfigs);
@@ -47,7 +49,8 @@ async function getDispatchEvents(app, context, branch, veracodeScanConfigs, issu
             fail_checks_on_error: veracodeScanConfigs[scanType].break_build_on_error,
           });
         const eventNameMatchingConfig = eventName.replaceAll(/issues?(_comment)?/g, 'issue');
-        if (veracodeScanConfigs[scanType][eventNameMatchingConfig]?.run_sandbox_scan_in_parallel &&
+        if (veracode_sandbox_scan_workflow &&
+          veracodeScanConfigs[scanType][eventNameMatchingConfig]?.run_sandbox_scan_in_parallel &&
           eventTrigger !== 'veracode-not-supported') {
           dispatchEvents.push({
             event_type: 'veracode-sast-sandbox-scan',

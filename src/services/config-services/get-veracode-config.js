@@ -11,7 +11,7 @@ async function getVeracodeScanConfig(app, context, veracodeAppConfig) {
   let veracodeConfigFromRepo = await getConfigFileFromRepo(
     app, octokit, owner, originalRepo, veracodeAppConfig.scan_config_file_location);
   // 2. if veracode.yml does not exist in original repository, get veracode.yml from default organization repository
-  if (veracodeConfigFromRepo === null) 
+  if (veracodeConfigFromRepo === null)
     veracodeConfigFromRepo = await getConfigFileFromRepo(
       app, octokit, owner, appConfig().defaultOrganisationRepository, veracodeAppConfig.scan_config_file_location);
 
@@ -55,8 +55,9 @@ async function getAppConfigFromRepo(app, context) {
   const defaultAppConfig = {
     scan_config_file_location: 'veracode.yml',
     process_scan_results_in_action: false,
+    veracode_sandbox_scan_workflow: false,
   };
-  const appConfigFile = await getConfigFileFromRepo(app, octokit, owner, 
+  const appConfigFile = await getConfigFileFromRepo(app, octokit, owner,
     appConfig().defaultOrganisationRepository, appConfig().appConfigFile);
   if (appConfigFile === null) return defaultAppConfig;
   try {
@@ -87,4 +88,4 @@ module.exports = {
   getVeracodeScanConfig,
   getEnabledRepositoriesFromOrg,
   getAppConfigFromRepo
-}
+};
